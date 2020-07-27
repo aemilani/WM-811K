@@ -51,7 +51,10 @@ print('Test accuracy:', score[1])
 predictions = cnn.predict(np.expand_dims(x_test[:, :, :, 2], axis=-1))
 
 cm = confusion_matrix(np.argmax(y_test, axis=1), np.argmax(predictions, axis=1))
-print('Confusion matrix:\n', cm)
+cm_norm = confusion_matrix(np.argmax(y_test, axis=1),
+                           np.argmax(predictions, axis=1), normalize='true')
+cm_norm = np.around(cm_norm, 2)
+print('Confusion matrix:\n', cm_norm)
 
 duration_train = datetime.datetime.now() - start - duration_data
 print('Training took {}.'.format(duration_train))
