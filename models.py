@@ -7,7 +7,7 @@ from tensorflow.keras.layers import Dropout
 def cnn(wm_dim):
     K.clear_session()
     model = Sequential()
-    model.add(Conv2D(16, (3, 3), padding='same', activation='relu', input_shape=(wm_dim, wm_dim, 1)))
+    model.add(Conv2D(16, (3, 3), padding='same', activation='relu', input_shape=(wm_dim, wm_dim, 3)))
     model.add(MaxPooling2D())
     model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
     model.add(MaxPooling2D())

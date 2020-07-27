@@ -1,5 +1,24 @@
+import os
+import logging
 import numpy as np
 import tensorflow as tf
+
+
+def setup_logger(logger_name, log_path):
+    log_file_path = os.path.join(log_path, '{}.log'.format(logger_name.lower()))
+    file_format = logging.Formatter('[%(asctime)s] %(levelname)-8s %(message)s',
+                                    datefmt='%Y/%m/%d %H:%M:%S')
+    console_format = logging.Formatter('%(levelname)-8s %(message)s')
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler(log_file_path)
+    file_handler.setFormatter(file_format)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(console_format)
+    stream_handler.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    return logger
 
 
 def resize_wafer_map(wm, target_size=(64, 64)):
