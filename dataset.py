@@ -5,7 +5,7 @@ from tensorflow.keras.utils import to_categorical
 from utils import resize_wafer_map, one_hot_img, add_noise
 
 
-def dataset(include_nonpattern=False):
+def dataset(include_nonpattern=False, wm_dim=64):
     df = pd.read_pickle("data/LSWMD.pkl")
     df = df.drop(['trianTestLabel'], axis=1)
     df = df.drop(['waferIndex'], axis=1)
@@ -22,8 +22,7 @@ def dataset(include_nonpattern=False):
         failure_types = ['Center', 'Donut', 'Edge-Loc', 'Edge-Ring', 'Loc', 'Random', 'Scratch', 'Near-full']
         df = df[(df['failureNum'] >= 0) & (df['failureNum'] <= 7)]
 
-    target_dim = 64
-    df['waferMapResized'] = df.waferMap.apply(lambda w: resize_wafer_map(w, target_size=(target_dim, target_dim))).\
+    df['waferMapResized'] = df.waferMap.apply(lambda w: resize_wafer_map(w, target_size=(wm_dim, wm_dim))).\
         apply(one_hot_img)
 
     for label in range(len(failure_types)):

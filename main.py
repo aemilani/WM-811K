@@ -3,23 +3,26 @@ import numpy as np
 import dataset as ds
 import models as md
 import matplotlib.pyplot as plt
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.metrics import confusion_matrix
 
 
 start = datetime.datetime.now()
 
-x_train, y_train, x_valid, y_valid, x_test, y_test = ds.dataset()
-wm_dim = x_train.shape[1]
+wm_dim = 64
+x_train, y_train, x_valid, y_valid, x_test, y_test = ds.dataset(wm_dim=wm_dim)
 
 duration_data = datetime.datetime.now() - start
+print('Dataset loaded successfully. Duration: {}'.format(duration_data))
 
 cnn = md.cnn(wm_dim=wm_dim)
 
-cb = [EarlyStopping(patience=3)]
+ea = EarlyStopping(patience=3)
+cp = ModelCheckpoint('checkpoints/cnn.h5', save_best_only=True)
+cb = [ea, cp]
 
 history = cnn.fit(np.expand_dims(x_train[:, :, :, 2], axis=-1),
-                  y_train, batch_size=1024, epochs=2,
+                  y_train, batch_size=1024, epochs=30,
                   validation_data=(np.expand_dims(x_valid[:, :, :, 2], axis=-1), y_valid),
                   callbacks=cb)
 
@@ -48,5 +51,7 @@ print('Test accuracy:', score[1])
 predictions = cnn.predict(np.expand_dims(x_test[:, :, :, 2], axis=-1))
 
 cm = confusion_matrix(np.argmax(y_test, axis=1), np.argmax(predictions, axis=1))
+print('Confusion matrix:\n', cm)
 
 duration_train = datetime.datetime.now() - start - duration_data
+print('Training took {}.'.format(duration_train))
