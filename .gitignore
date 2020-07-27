@@ -1,0 +1,5 @@
+*.pdf
+*.pptx
+__pycache__/
+.idea/
+data/
