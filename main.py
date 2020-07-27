@@ -12,7 +12,8 @@ from utils import setup_logger
 start = datetime.datetime.now()
 date, time = str(start).split()
 
-dirr = 'results/{}/{}/'.format(date, time)
+
+dirr = 'results/{}/{}/'.format(date, time.replace(':', '-'))
 os.makedirs(dirr)
 cp_path = os.path.join(dirr, 'checkpoints')
 log_path = os.path.join(dirr, 'logs')
