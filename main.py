@@ -25,7 +25,8 @@ logger = setup_logger('main', log_path)
 wm_dim = 64
 
 logger.info('Loading the dataset ...')
-x_train, y_train, x_valid, y_valid, x_test, y_test = ds.dataset(wm_dim=wm_dim)
+x_train, y_train, x_valid, y_valid, x_test, y_test = \
+    ds.dataset(include_nonpattern=False, wm_dim=wm_dim)
 duration_data = datetime.datetime.now() - start
 logger.info('Dataset loaded successfully. Duration: {}'.format(duration_data))
 
@@ -74,7 +75,7 @@ predictions = cnn.predict(x_test)
 cm = confusion_matrix(np.argmax(y_test, axis=1), np.argmax(predictions, axis=1))
 cm_norm = confusion_matrix(np.argmax(y_test, axis=1),
                            np.argmax(predictions, axis=1), normalize='true')
-cm_norm = np.around(cm_norm, 2)
+cm_norm = np.around(cm_norm, 3)
 
 np.savetxt(os.path.join(dirr, 'cm.csv'), cm, delimiter=',')
 np.savetxt(os.path.join(dirr, 'cm_norm.csv'), cm_norm, delimiter=',')

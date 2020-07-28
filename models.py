@@ -13,6 +13,8 @@ def cnn(wm_dim):
     model.add(MaxPooling2D())
     model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
     model.add(MaxPooling2D())
+    model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+    model.add(MaxPooling2D())
     model.add(Flatten())
     model.add(Dropout(0.25))
     model.add(Dense(128, activation='relu'))

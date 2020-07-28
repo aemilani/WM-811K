@@ -11,15 +11,17 @@ def dataset(include_nonpattern=False, wm_dim=64):
     df = df.drop(['waferIndex'], axis=1)
 
     df['failureNum'] = df.failureType
-    mapping = {'Center': 0, 'Donut': 1, 'Edge-Loc': 2, 'Edge-Ring': 3, 'Loc': 4, 'Random': 5, 'Scratch': 6,
-               'Near-full': 7, 'none': 8}
+    mapping = {'Center': 0, 'Donut': 1, 'Edge-Loc': 2, 'Edge-Ring': 3,
+               'Loc': 4, 'Near-full': 5, 'Random': 6, 'Scratch': 7, 'none': 8}
     df = df.replace({'failureNum': mapping})
 
     if include_nonpattern:
-        failure_types = ['Center', 'Donut', 'Edge-Loc', 'Edge-Ring', 'Loc', 'Random', 'Scratch', 'Near-full', 'none']
+        failure_types = ['Center', 'Donut', 'Edge-Loc', 'Edge-Ring',
+                         'Loc', 'Near-full', 'Random', 'Scratch', 'none']
         df = df[(df['failureNum'] >= 0) & (df['failureNum'] <= 8)]
     else:
-        failure_types = ['Center', 'Donut', 'Edge-Loc', 'Edge-Ring', 'Loc', 'Random', 'Scratch', 'Near-full']
+        failure_types = ['Center', 'Donut', 'Edge-Loc', 'Edge-Ring',
+                         'Loc', 'Near-full', 'Random', 'Scratch']
         df = df[(df['failureNum'] >= 0) & (df['failureNum'] <= 7)]
 
     df['waferMapResized'] = df.waferMap.apply(lambda w: resize_wafer_map(w, target_size=(wm_dim, wm_dim))).\
