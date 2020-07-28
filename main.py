@@ -5,6 +5,7 @@ import dataset as ds
 import models as md
 import matplotlib.pyplot as plt
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.models import load_model
 from sklearn.metrics import confusion_matrix
 from utils import setup_logger
 
@@ -43,6 +44,8 @@ history = cnn.fit(x_train,
                   callbacks=cb)
 duration_train = datetime.datetime.now() - start - duration_data
 logger.info('Training ended. Duration: {}'.format(duration_train))
+
+cnn = load_model(os.path.join(cp_path, 'cnn.h5'))
 
 plt.figure()
 plt.plot(history.history['loss'], label='Training loss')
