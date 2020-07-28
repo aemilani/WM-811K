@@ -4,7 +4,11 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.layers import Dropout
 
 
-def cnn(wm_dim):
+def cnn(wm_dim, include_nonpattern=False):
+    if include_nonpattern:
+        n_cls = 9
+    else:
+        n_cls = 8
     K.clear_session()
     model = Sequential()
     model.add(Conv2D(16, (3, 3), padding='same', activation='relu', input_shape=(wm_dim, wm_dim, 3)))
@@ -19,7 +23,7 @@ def cnn(wm_dim):
     model.add(Dropout(0.25))
     model.add(Dense(128, activation='relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(8, activation='softmax'))
+    model.add(Dense(n_cls, activation='softmax'))
     
     model.compile('nadam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
     
