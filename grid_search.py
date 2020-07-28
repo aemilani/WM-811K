@@ -10,7 +10,8 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
-os.mkdir('grid_chp/')
+if not os.path.exists('grid_chp/'):
+    os.mkdir('grid_chp/')
 
 wm_dim = 64
 x_train, y_train, x_valid, y_valid, x_test, y_test = \
