@@ -22,7 +22,7 @@ os.mkdir(log_path)
 
 logger = setup_logger('main', log_path)
 
-wm_dim = 64
+wm_dim = 128
 
 logger.info('Loading the dataset ...')
 x_train, y_train, x_valid, y_valid, x_test, y_test = \
@@ -32,7 +32,7 @@ logger.info('Dataset loaded successfully. Duration: {}'.format(duration_data))
 
 cnn = md.cnn(wm_dim=wm_dim)
 
-ea = EarlyStopping(patience=3)
+ea = EarlyStopping(patience=5)
 cp = ModelCheckpoint(os.path.join(cp_path, 'cnn.h5'), save_best_only=True)
 cb = [ea, cp]
 
