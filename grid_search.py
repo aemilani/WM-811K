@@ -10,6 +10,8 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
+start = datetime.datetime.now()
+
 if not os.path.exists('grid_chp/'):
     os.mkdir('grid_chp/')
 
@@ -140,3 +142,7 @@ print('Best score (loss):', best_loss[1], best_loss[2])
 
 print('Best setting (acc):', best_acc[0])
 print('Best score (acc):', best_acc[1], best_acc[2])
+
+duration = datetime.datetime.now() - start
+
+print('Grid search took {}'.format(duration))
