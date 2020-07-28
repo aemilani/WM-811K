@@ -24,8 +24,7 @@ dense = [128, 256]
 batch = [512, 1024]
 opt = ['adam', 'nadam']
 
-dic_loss = {}
-dic_acc = {}
+result = []
 
 for h1 in hidden_1:
     for h2 in hidden_2:
@@ -65,12 +64,14 @@ for h1 in hidden_1:
                     score = model.evaluate(x_test, y_test, verbose=0)
                     test_loss = score[0]
                     test_acc = score[1]
-                    dic_loss['hidden_1: {}, hidden_2: {}, hidden_3: {}, hidden_4: {}, dense: {}' \
-                        .format(h1, h2, h3, h4, d)] = test_loss
-                    dic_acc['hidden_1: {}, hidden_2: {}, hidden_3: {}, hidden_4: {}, dense: {}' \
-                        .format(h1, h2, h3, h4, d)] = test_acc
-                    
-print('Best setting (loss):', min(dic_loss))
-print('Best score (loss):', dic_loss[min(dic_loss)])
-print('Best setting (acc):', max(dic_acc))
-print('Best score (acc):', dic_acc[max(dic_acc)])
+                    dic = {'hidden_1': h1, 'hidden_2': h2, 'hidden_3': h3,
+                           'hidden_4': h4, 'dense': d}
+                    result.append((dic, test_loss, test_acc))
+
+result.sort(key=lambda x: x[1])
+print('Best setting (loss):', result[0][0])
+print('Best score (loss):', result[0][1], result[0][2])
+
+result.sort(key=lambda x: x[2])
+print('Best setting (acc):', result[-1][0])
+print('Best score (acc):', result[-1][1], result[-1][2])
