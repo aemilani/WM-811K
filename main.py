@@ -22,7 +22,7 @@ os.mkdir(log_path)
 
 logger = setup_logger('main', log_path)
 
-wm_dim = 128
+wm_dim = 64
 
 logger.info('Loading the dataset ...')
 x_train, y_train, x_valid, y_valid, x_test, y_test = \
