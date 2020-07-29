@@ -44,7 +44,7 @@ def train_cnn(cnn, x_tr, y_tr, x_v, y_v, x_te, y_te, batch_size):
     return score
 
 
-def grid_search_architecture(hidden_1, hidden_2, hidden_3, hidden_4, dense, dim):
+def grid_search_architecture(hidden_1, hidden_2, hidden_3, hidden_4, dense, dim, x_tr, y_tr, x_v, y_v):
     count_total = len(hidden_1) * len(hidden_2) * len(hidden_3) * len(hidden_4) * len(dense)
     result = []
     ctr = 1
@@ -55,14 +55,14 @@ def grid_search_architecture(hidden_1, hidden_2, hidden_3, hidden_4, dense, dim)
                     for d in dense:
                         print('Architecture setting {} out of {} ...'.format(ctr, count_total))
                         model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim)
-                        test_score_1 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
-                                                 x_v=x_valid, y_v=y_valid,
-                                                 x_te=x_valid, y_te=y_valid, batch_size=1024)
+                        test_score_1 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
+                                                 x_v=x_v, y_v=y_v,
+                                                 x_te=x_v, y_te=y_v, batch_size=1024)
                         test_acc_1 = test_score_1[1]
                         model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim)
-                        test_score_2 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
-                                                 x_v=x_valid, y_v=y_valid,
-                                                 x_te=x_valid, y_te=y_valid, batch_size=1024)
+                        test_score_2 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
+                                                 x_v=x_v, y_v=y_v,
+                                                 x_te=x_v, y_te=y_v, batch_size=1024)
                         test_acc_2 = test_score_2[1]
                         test_acc = (test_acc_1 + test_acc_2) / 2
                         dic = {'h1': h1, 'h2': h2, 'h3': h3, 'h4': h4, 'd': d}
@@ -72,7 +72,7 @@ def grid_search_architecture(hidden_1, hidden_2, hidden_3, hidden_4, dense, dim)
     return result
 
 
-def grid_search_parameters(best_architecture, optimizer, batch_size, dim):
+def grid_search_parameters(best_architecture, optimizer, batch_size, dim, x_tr, y_tr, x_v, y_v):
     count_total = len(optimizer) * len(batch_size)
     h1 = best_architecture['h1']
     h2 = best_architecture['h2']
@@ -85,14 +85,14 @@ def grid_search_parameters(best_architecture, optimizer, batch_size, dim):
         for b in batch_size:
             print('Hyperparameter setting {} out of {} ...'.format(ctr, count_total))
             model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim)
-            test_score_1 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
-                                     x_v=x_valid, y_v=y_valid,
-                                     x_te=x_valid, y_te=y_valid, batch_size=b)
+            test_score_1 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
+                                     x_v=x_v, y_v=y_v,
+                                     x_te=x_v, y_te=y_v, batch_size=b)
             test_acc_1 = test_score_1[1]
             model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim)
-            test_score_2 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
-                                     x_v=x_valid, y_v=y_valid,
-                                     x_te=x_valid, y_te=y_valid, batch_size=b)
+            test_score_2 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
+                                     x_v=x_v, y_v=y_v,
+                                     x_te=x_v, y_te=y_v, batch_size=b)
             test_acc_2 = test_score_2[1]
             test_acc = (test_acc_1 + test_acc_2) / 2
             dic = {'h1': h1, 'h2': h2, 'h3': h3, 'h4': h4, 'd': d, 'o': o, 'b': b}
@@ -110,14 +110,16 @@ if __name__ == '__main__':
     x_train, y_train, x_valid, y_valid, x_test, y_test = \
         ds.dataset(include_nonpattern=False, wm_dim=wm_dim)
 
-    grid_result_arc = grid_search_architecture(hidden_1=[16, 32], hidden_2=[32, 64], hidden_3=[32, 64],
-                                               hidden_4=[64, 128], dense=[128, 256], dim=wm_dim)
+    grid_result_arc = grid_search_architecture(hidden_1=[16, 32], hidden_2=[32, 64], hidden_3=[64, 128],
+                                               hidden_4=[28, 256], dense=[128, 256], dim=wm_dim,
+                                               x_tr=x_train, y_tr=y_train, x_v=x_valid, y_v=y_valid)
     grid_result_arc.sort(key=lambda x: x[1])
     best_grid_result_arc = grid_result_arc[-1]
     best_arc = best_grid_result_arc[0]
 
     grid_result_param = grid_search_parameters(best_architecture=best_arc, optimizer=['adam', 'nadam'],
-                                               batch_size=[128, 256, 512, 1024], dim=wm_dim)
+                                               batch_size=[128, 256, 512, 1024], dim=wm_dim,
+                                               x_tr=x_train, y_tr=y_train, x_v=x_valid, y_v=y_valid)
     grid_result_param.sort(key=lambda x: x[1])
     best_grid_result = grid_result_param[-1]
     
