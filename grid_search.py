@@ -1,6 +1,5 @@
 import os
 import datetime
-import numpy as np
 import tensorflow.keras.backend as K
 import dataset as ds
 from tensorflow.keras import Sequential
