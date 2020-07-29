@@ -55,10 +55,13 @@ def grid_search_architecture(hidden_1, hidden_2, hidden_3, hidden_4, dense, dim)
                     for d in dense:
                         print('Architecture setting {} out of {} ...'.format(ctr, count_total))
                         model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim)
-                        test_score_1 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train, x_v=x_valid, y_v=y_valid,
-                                               x_te=x_test, y_te=y_test, batch_size=1024)
+                        test_score_1 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
+                                                 x_v=x_valid, y_v=y_valid,
+                                                 x_te=x_valid, y_te=y_valid, batch_size=1024)
                         test_acc_1 = test_score_1[1]
-                        test_score_2 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train, x_v=x_test, y_v=y_test,
+                        model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim)
+                        test_score_2 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
+                                                 x_v=x_valid, y_v=y_valid,
                                                  x_te=x_valid, y_te=y_valid, batch_size=1024)
                         test_acc_2 = test_score_2[1]
                         test_acc = (test_acc_1 + test_acc_2) / 2
@@ -82,11 +85,14 @@ def grid_search_parameters(best_architecture, optimizer, batch_size, dim):
         for b in batch_size:
             print('Hyperparameter setting {} out of {} ...'.format(ctr, count_total))
             model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim)
-            test_score_1 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train, x_v=x_valid, y_v=y_valid,
-                                   x_te=x_test, y_te=y_test, batch_size=b)
+            test_score_1 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
+                                     x_v=x_valid, y_v=y_valid,
+                                     x_te=x_valid, y_te=y_valid, batch_size=b)
             test_acc_1 = test_score_1[1]
-            test_score_2 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train, x_v=x_test, y_v=y_test,
-                                   x_te=x_valid, y_te=y_valid, batch_size=b)
+            model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim)
+            test_score_2 = train_cnn(cnn=model, x_tr=x_train, y_tr=y_train,
+                                     x_v=x_valid, y_v=y_valid,
+                                     x_te=x_valid, y_te=y_valid, batch_size=b)
             test_acc_2 = test_score_2[1]
             test_acc = (test_acc_1 + test_acc_2) / 2
             dic = {'h1': h1, 'h2': h2, 'h3': h3, 'h4': h4, 'd': d, 'o': o, 'b': b}
