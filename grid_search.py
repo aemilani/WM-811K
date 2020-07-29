@@ -111,7 +111,7 @@ if __name__ == '__main__':
         ds.dataset(include_nonpattern=False, wm_dim=wm_dim)
 
     grid_result_arc = grid_search_architecture(hidden_1=[16, 32], hidden_2=[32, 64], hidden_3=[64, 128],
-                                               hidden_4=[28, 256], dense=[128, 256], dim=wm_dim,
+                                               hidden_4=[128, 256], dense=[128, 256], dim=wm_dim,
                                                x_tr=x_train, y_tr=y_train, x_v=x_valid, y_v=y_valid)
     grid_result_arc.sort(key=lambda x: x[1])
     best_grid_result_arc = grid_result_arc[-1]
