@@ -97,6 +97,7 @@ def grid_search_parameters(best_architecture, optimizer, batch_size, dim):
 
 
 if __name__ == '__main__':
+    
     start = datetime.datetime.now()
 
     wm_dim = 64
@@ -113,6 +114,10 @@ if __name__ == '__main__':
                                                batch_size=[128, 256, 512, 1024], dim=wm_dim)
     grid_result_param.sort(key=lambda x: x[1])
     best_grid_result = grid_result_param[-1]
+    
+    duration = datetime.datetime.now() - start
+    
+    print('\nGrid search ended. Duration: {}'.format(duration))
 
-    print('Best settings:\n', best_grid_result[0])
+    print('\nBest settings:\n', best_grid_result[0])
     print('\nBest settings test accuracy:', best_grid_result[1])
