@@ -9,7 +9,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
-def build_cnn(n_h1, n_h2, n_h3, n_h4, n_d, opt, dim):
+def build_cnn(n_h1, n_h2, n_h3, n_h4, n_d, opt, dim, do1, do2):
     K.clear_session()
 
     cnn = Sequential()
@@ -22,9 +22,9 @@ def build_cnn(n_h1, n_h2, n_h3, n_h4, n_d, opt, dim):
     cnn.add(Conv2D(n_h4, (3, 3), padding='same', activation='relu'))
     cnn.add(MaxPooling2D())
     cnn.add(Flatten())
-    cnn.add(Dropout(0.25))
+    cnn.add(Dropout(do1))
     cnn.add(Dense(n_d, activation='relu'))
-    cnn.add(Dropout(0.5))
+    cnn.add(Dropout(do2))
     cnn.add(Dense(8, activation='softmax'))
     cnn.compile(opt, loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 
@@ -54,15 +54,13 @@ def grid_search_architecture(hidden_1, hidden_2, hidden_3, hidden_4, dense, dim,
                 for h4 in hidden_4:
                     for d in dense:
                         print('Architecture setting {} out of {} ...'.format(ctr, count_total))
-                        model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim)
+                        model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim, do1=0.25, do2=0.5)
                         test_score_1 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
-                                                 x_v=x_v, y_v=y_v,
-                                                 x_te=x_v, y_te=y_v, batch_size=1024)
+                                                 x_v=x_v, y_v=y_v, x_te=x_v, y_te=y_v, batch_size=1024)
                         test_acc_1 = test_score_1[1]
-                        model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim)
+                        model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt='nadam', dim=dim, do1=0.25, do2=0.5)
                         test_score_2 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
-                                                 x_v=x_v, y_v=y_v,
-                                                 x_te=x_v, y_te=y_v, batch_size=1024)
+                                                 x_v=x_v, y_v=y_v, x_te=x_v, y_te=y_v, batch_size=1024)
                         test_acc_2 = test_score_2[1]
                         test_acc = (test_acc_1 + test_acc_2) / 2
                         dic = {'h1': h1, 'h2': h2, 'h3': h3, 'h4': h4, 'd': d}
@@ -72,8 +70,8 @@ def grid_search_architecture(hidden_1, hidden_2, hidden_3, hidden_4, dense, dim,
     return result
 
 
-def grid_search_parameters(best_architecture, optimizer, batch_size, dim, x_tr, y_tr, x_v, y_v):
-    count_total = len(optimizer) * len(batch_size)
+def grid_search_parameters(best_architecture, optimizer, batch_size, dropouts_1, dropouts_2, dim, x_tr, y_tr, x_v, y_v):
+    count_total = len(optimizer) * len(batch_size) * len(dropouts_1) * len(dropouts_2)
     h1 = best_architecture['h1']
     h2 = best_architecture['h2']
     h3 = best_architecture['h3']
@@ -81,24 +79,24 @@ def grid_search_parameters(best_architecture, optimizer, batch_size, dim, x_tr, 
     d = best_architecture['d']
     result = []
     ctr = 1
-    for o in optimizer:
-        for b in batch_size:
-            print('Hyperparameter setting {} out of {} ...'.format(ctr, count_total))
-            model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim)
-            test_score_1 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
-                                     x_v=x_v, y_v=y_v,
-                                     x_te=x_v, y_te=y_v, batch_size=b)
-            test_acc_1 = test_score_1[1]
-            model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim)
-            test_score_2 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
-                                     x_v=x_v, y_v=y_v,
-                                     x_te=x_v, y_te=y_v, batch_size=b)
-            test_acc_2 = test_score_2[1]
-            test_acc = (test_acc_1 + test_acc_2) / 2
-            dic = {'h1': h1, 'h2': h2, 'h3': h3, 'h4': h4, 'd': d, 'o': o, 'b': b}
-            res = (dic, test_acc)
-            result.append(res)
-            ctr += 1
+    for do1 in dropouts_1:
+        for do2 in dropouts_2:
+            for o in optimizer:
+                for b in batch_size:
+                    print('Hyperparameter setting {} out of {} ...'.format(ctr, count_total))
+                    model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim, do1=do1, do2=do2)
+                    test_score_1 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
+                                             x_v=x_v, y_v=y_v, x_te=x_v, y_te=y_v, batch_size=b)
+                    test_acc_1 = test_score_1[1]
+                    model = build_cnn(n_h1=h1, n_h2=h2, n_h3=h3, n_h4=h4, n_d=d, opt=o, dim=dim, do1=do1, do2=do2)
+                    test_score_2 = train_cnn(cnn=model, x_tr=x_tr, y_tr=y_tr,
+                                             x_v=x_v, y_v=y_v, x_te=x_v, y_te=y_v, batch_size=b)
+                    test_acc_2 = test_score_2[1]
+                    test_acc = (test_acc_1 + test_acc_2) / 2
+                    dic = {'h1': h1, 'h2': h2, 'h3': h3, 'h4': h4, 'd': d, 'o': o, 'b': b}
+                    res = (dic, test_acc)
+                    result.append(res)
+                    ctr += 1
     return result
 
 
@@ -118,14 +116,13 @@ if __name__ == '__main__':
     best_arc = best_grid_result_arc[0]
 
     grid_result_param = grid_search_parameters(best_architecture=best_arc, optimizer=['adam', 'nadam'],
-                                               batch_size=[128, 256, 512, 1024], dim=wm_dim,
-                                               x_tr=x_train, y_tr=y_train, x_v=x_valid, y_v=y_valid)
+                                               batch_size=[128, 256, 512, 1024], dropouts_1=[0.25, 0.5], dropouts_2=[0.25, 0.5],
+                                               dim=wm_dim, x_tr=x_train, y_tr=y_train, x_v=x_valid, y_v=y_valid)
     grid_result_param.sort(key=lambda x: x[1])
     best_grid_result = grid_result_param[-1]
     
     duration = datetime.datetime.now() - start
     
     print('\nGrid search ended. Duration: {}'.format(duration))
-
     print('\nBest settings:\n', best_grid_result[0])
-    print('\nBest settings test accuracy:', best_grid_result[1])
+    print('\nBest settings validation set accuracy:', best_grid_result[1])
