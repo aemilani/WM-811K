@@ -39,7 +39,7 @@ cb = [ea, cp]
 
 logger.info('Training starting ...')
 history = cnn.fit(x_train,
-                  y_train, batch_size=1024, epochs=30,
+                  y_train, batch_size=512, epochs=30,
                   validation_data=(x_valid, y_valid),
                   callbacks=cb)
 duration_train = datetime.datetime.now() - start - duration_data
