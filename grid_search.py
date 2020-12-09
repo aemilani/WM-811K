@@ -105,8 +105,7 @@ if __name__ == '__main__':
     start = datetime.datetime.now()
 
     wm_dim = 64
-    x_train, y_train, x_valid, y_valid, x_test, y_test = \
-        ds.dataset_multi(wm_dim=wm_dim)
+    x_train, y_train, x_valid, y_valid, x_test, y_test = ds.dataset_multi(wm_dim=wm_dim)
 
     grid_result_arc = grid_search_architecture(hidden_1=[16, 32], hidden_2=[32, 64], hidden_3=[64, 128],
                                                hidden_4=[128, 256], dense=[128, 256], dim=wm_dim,
