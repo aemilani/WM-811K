@@ -43,4 +43,4 @@ threadpoolctl==2.1.0
 urllib3==2.6.3
 Werkzeug==3.1.6
 wrapt==1.12.1
-zipp==3.4.0
+zipp==3.19.1
